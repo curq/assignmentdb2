@@ -1,7 +1,10 @@
 {
   "name": "deployment-example-prisma-vercel",
   "dependencies": {
+    "@ant-design/icons": "^4.8.0",
     "@prisma/client": "4.6.1",
+    "antd": "^5.0.0",
+    "dotenv": "^16.0.3",
     "next": "13.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -10,7 +13,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && next build",
     "prisma:generate": "prisma generate"
   },
   "devDependencies": {

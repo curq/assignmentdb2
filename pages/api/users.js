@@ -1,35 +1,77 @@
-import prisma from '../../lib/prisma'
-import { Prisma } from '@prisma/client'
+import prisma from "../../lib/prisma"
 
-export default async (req, res) => {
-  if (req.method === 'GET') {
-    try {
-      const users = await prisma.user.findMany({
-        include: { profiles: true },
-      })
-      res.status(200).json(users)
-    } catch (error) {
-      console.error(error)
-      res.status(500).json(error)
-    }
-  } else if (req.method === 'POST') {
-    try {
-      const createdUser = await prisma.user.create({
-        data: req.body,
-      })
-      res.status(200).json(createdUser)
-    } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          return res
-            .status(409)
-            .json({ error: 'A user with this email already exists' })
+const upd = async (email, name, surname, salary, phone, cname) => {
+    const res = await prisma.users.update({
+        where: {
+            email: email
+        },
+        data: {
+            name: name,
+            surname: surname,
+            salary: salary,
+            phone: phone,
+            cname: cname
         }
-      }
-      console.error(e)
-      return res.status(500)
+    })
+
+    return res
+}
+
+const crt = async (email, name, surname, salary, phone, cname) => {
+    const res = await prisma.users.create({
+        data: {
+            email: email,
+            name: name,
+            surname: surname,
+            salary: salary,
+            phone: phone,
+            cname: cname
+        }
+    })
+
+    return res
+}
+
+const dlt = async (email) => {
+    const res = await prisma.users.delete({
+        where: {
+            email: email
+        }
+    })
+
+    return res
+}
+
+
+
+export default async function handler(req, res) {
+    if (req.method === 'POST') {
+        console.log('first')
+        const result = await crt(
+            req.body.email, req.body.name, req.body.surname,
+            parseInt(req.body.salary), req.body.phone, req.body.cname
+        )
+        return res.json(result)
     }
-  } else {
-    res.status(404)
-  }
+
+    if (req.method === 'PUT') {
+        const result = await upd(
+            req.body.email, req.body.name, req.body.surname,
+            parseInt(req.body.salary), req.body.phone, req.body.cname
+        )
+        return res.json(result)
+    }
+
+    if (req.method === 'DELETE') {
+        const result = await dlt(req.body.email)
+        return res.json(result)
+    }
+
+    if (req.method === 'GET') {
+        const result = await prisma.users.findMany({
+        });
+
+        return res.json(result)
+    }
+    res.status(404).end();
 }
